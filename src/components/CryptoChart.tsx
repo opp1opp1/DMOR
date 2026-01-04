@@ -14,20 +14,29 @@ export const CryptoChart: React.FC<ChartProps> = ({ symbol }) => {
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
+    // Initial setup with container dimensions
     const chart = createChart(chartContainerRef.current, {
       layout: {
         background: { type: ColorType.Solid, color: 'transparent' },
-        textColor: '#d1d5db', // tailwind gray-300
+        textColor: '#64748b', // slate-500
       },
       grid: {
-        vertLines: { color: '#374151' }, // tailwind gray-700
-        horzLines: { color: '#374151' },
+        vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
+        horzLines: { color: 'rgba(255, 255, 255, 0.05)' },
       },
       width: chartContainerRef.current.clientWidth,
-      height: 400,
+      height: chartContainerRef.current.clientHeight,
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
+        borderVisible: false,
+      },
+      rightPriceScale: {
+        borderVisible: false,
+        scaleMargins: {
+          top: 0.1,
+          bottom: 0.1,
+        },
       },
     });
 
@@ -41,13 +50,15 @@ export const CryptoChart: React.FC<ChartProps> = ({ symbol }) => {
       wickDownColor: '#ef4444',
     });
 
-    const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({ width: chartContainerRef.current.clientWidth });
-      }
-    };
+    // Resize Observer to handle flexible parent containers
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!chartRef.current || entries.length === 0) return;
+      const { width, height } = entries[0].contentRect;
+      chartRef.current.applyOptions({ width, height });
+      chartRef.current.timeScale().fitContent();
+    });
 
-    window.addEventListener('resize', handleResize);
+    resizeObserver.observe(chartContainerRef.current);
 
     // Fetch data
     fetch(`/api/history?symbol=${encodeURIComponent(symbol)}`)
@@ -61,21 +72,15 @@ export const CryptoChart: React.FC<ChartProps> = ({ symbol }) => {
       .catch(err => console.error('Failed to load chart data', err));
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
       chart.remove();
     };
   }, [symbol]);
 
   return (
-    <div className="w-full p-4 bg-gray-900 rounded-xl border border-gray-800 shadow-xl">
-      <div className="mb-4 flex justify-between items-center">
-        <h3 className="text-lg font-bold text-white">{symbol} Chart</h3>
-        <span className="text-xs text-gray-500">4H Timeframe</span>
-      </div>
-      <div 
-        ref={chartContainerRef} 
-        className="w-full h-[400px]"
-      />
-    </div>
+    <div 
+      ref={chartContainerRef} 
+      className="w-full h-full"
+    />
   );
 };

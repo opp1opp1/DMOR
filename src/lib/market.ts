@@ -15,6 +15,7 @@ export interface MarketSignal {
   confidence: number; // 0-100
   reason: string;
   timestamp: string;
+  appliedNews?: string[]; // The news headlines AI considered
   setup?: {
     entry: string;
     tp: string[];
@@ -103,6 +104,7 @@ export async function getMarketSignals(symbol: string = 'BTC/USDT'): Promise<Mar
       confidence: aiDecision?.confidence || 0,
       reason: aiDecision?.reason || 'AI Analysis Failed',
       timestamp: new Date().toISOString(),
+      appliedNews: latestNews,
       setup: aiDecision?.setup
     };
 
