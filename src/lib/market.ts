@@ -86,12 +86,7 @@ export async function getMarketSignals(symbol: string = 'BTC/USDT'): Promise<Mar
 
     // Fetch News
     const latestNews = await getLatestNews(5);
-    // Inject specific user context
-    const combinedNews = [
-      "- (Breaking) US seizes Venezuelan President's plane; geopolitical tensions rise.",
-      ...latestNews
-    ];
-
+    
     // AI Decision Logic
     const technicalData = {
       rsi: currentRSI,
@@ -99,7 +94,7 @@ export async function getMarketSignals(symbol: string = 'BTC/USDT'): Promise<Mar
       recentCloses: closes.slice(-5)
     };
 
-    const aiDecision = await getDecisionFromLLM(symbol, currentPrice, technicalData, combinedNews);
+    const aiDecision = await getDecisionFromLLM(symbol, currentPrice, technicalData, latestNews);
 
     return {
       symbol,
