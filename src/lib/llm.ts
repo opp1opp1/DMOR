@@ -48,7 +48,7 @@ export async function getDecisionFromLLM(
   symbol: string,
   price: number,
   technicalData: any,
-  news: string[] = []
+  newsContext: string = ''
 ): Promise<LLMDecision | null> {
   const genAI = getGenAI();
   // Use gemini-1.5-flash for potentially better stability/limits, or stick to 2.0-flash-exp if preferred.
@@ -82,8 +82,8 @@ export async function getDecisionFromLLM(
   const newsPrompt = `
     You are a Crypto Market Sentiment Analyst. Analyze news for ${symbol}.
     
-    News Headlines:
-    ${news.length > 0 ? news.join('\n') : 'No specific news.'}
+    News Context (Source | Title | Date | Summary):
+    ${newsContext || 'No specific news available.'}
 
     Output JSON:
     {

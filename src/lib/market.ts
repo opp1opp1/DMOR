@@ -1,7 +1,7 @@
 import ccxt from 'ccxt';
 import { RSI, SMA } from 'technicalindicators';
 import { getDecisionFromLLM } from './llm';
-import { getLatestNews } from './news';
+import { getNewsContext, formatNewsForDisplay, formatNewsForAI } from './news';
 
 // Initialize exchange (using Binance public API for now, no keys needed for public data)
 const exchange = new ccxt.binance({
@@ -85,8 +85,9 @@ export async function getMarketSignals(symbol: string = 'BTC/USDT'): Promise<Mar
     const sma20Values = SMA.calculate(sma20Input);
     const currentSMA = sma20Values[sma20Values.length - 1];
 
-    // Fetch News
-    const latestNews = await getLatestNews(5);
+    // Fetch News (Contextual & General)
+    const newsItems = await getNewsContext(symbol, 5);
+    const formattedNewsForAI = formatNewsForAI(newsItems);
     
     // AI Decision Logic
     const technicalData = {
@@ -95,7 +96,7 @@ export async function getMarketSignals(symbol: string = 'BTC/USDT'): Promise<Mar
       recentCloses: closes.slice(-5)
     };
 
-    const aiDecision = await getDecisionFromLLM(symbol, currentPrice, technicalData, latestNews);
+    const aiDecision = await getDecisionFromLLM(symbol, currentPrice, technicalData, formattedNewsForAI);
 
     return {
       symbol,
@@ -104,7 +105,7 @@ export async function getMarketSignals(symbol: string = 'BTC/USDT'): Promise<Mar
       confidence: aiDecision?.confidence || 0,
       reason: aiDecision?.reason || 'AI Analysis Failed',
       timestamp: new Date().toISOString(),
-      appliedNews: latestNews,
+      appliedNews: formatNewsForDisplay(newsItems),
       setup: aiDecision?.setup
     };
 
