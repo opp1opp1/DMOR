@@ -61,7 +61,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen p-4 md:p-8 w-full max-w-[1920px] mx-auto bg-[#0a0a0a]">
+    <main className="min-h-screen p-4 md:p-8 w-full mx-auto bg-[#0a0a0a]">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
         <div>
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white mb-2 font-mono">
@@ -90,7 +90,7 @@ export default function Home() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(880px,1fr))] gap-6">
         {signals.map((signal) => (
           <SignalCard key={signal.symbol} signal={signal} />
         ))}
@@ -131,9 +131,9 @@ function SignalCard({ signal }: { signal: Signal }) {
   }
 
   return (
-    <div className={`relative overflow-hidden group rounded-xl border ${borderColor} ${bgColor} transition-all hover:border-opacity-50 hover:shadow-2xl flex flex-col`}>
+    <div className={`relative overflow-hidden group rounded-xl border ${borderColor} ${bgColor} transition-all hover:border-opacity-50 hover:shadow-2xl flex flex-col h-full`}>
       {/* 頂部標頭 */}
-      <div className="p-5 border-b border-white/5 flex justify-between items-start">
+      <div className="p-4 border-b border-white/5 flex justify-between items-start">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h2 className="text-xl font-black text-white tracking-tight">{signal.symbol.split('/')[0]}</h2>
@@ -149,7 +149,7 @@ function SignalCard({ signal }: { signal: Signal }) {
       </div>
 
       {/* 核心內容區 */}
-      <div className="p-5 space-y-5 flex-grow">
+      <div className="p-4 space-y-5 flex-grow">
         
         {/* 1. 分析理由 */}
         <div>
